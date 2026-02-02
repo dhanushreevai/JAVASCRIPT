@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="getbook()">
+    <p align="center">
+        <input type="text" id="bookname" placeholder="Enter Book Name">
+        <button onclick="save()">Save</button>
+       <input type="text" id="search" placeholder="Search the book" onkeyup="search()">
+        <button onclick="search()">Search</button>
+    </p>
+    <table align="center" cellpadding="15" border="1">
+        <thead>
+            <tr>
+            <th>ID</th>
+            <th>Book Name</th>
+            <th colspan="2">Action</th>
+            </tr>
+        </thead>
+        <tbody id="container"></tbody>
+    </table> 
+
+
+    <script>
+          let userid=""
+        const save = async () =>{
+           let name=document.getElementById("bookname").value
+           let url= "http://localhost:1234/userapi"
+           let newbook={bookname:name}
+           let mymethod="post"
+           if(userid!=""){
+             mymethod="put"
+             url= "http://localhost:1234/userapi/" + userid
+             userid =""
+
+           }
+           let postdata = {
+            headers :{'content-type':'application/json'}, 
+            method:mymethod,
+            body:JSON.stringify(newbook)
+           }
+           try{
+           await fetch(url,postdata)
+           .then(response=>response.json())
+           .then(info =>{
+              console.log(info)
+           })
+           }
+           catch (error){
+            alert("Server Slow")
+           }   
+        }
+         const getbook = () =>{
+            fetch("http://localhost:1234/userapi")
+            .then(response => response.json())
+            .then(userarray=>{
+                let data=""
+                userarray.map((user,index)=>{
+                    data=data+`<tr>
+                        <td>${user.id}</td>
+                        <td>${user.bookname}</td>
+                        <td><button onclick="edit('${user.id}')">Edit</button></td>
+                        <td><button onclick="del('${user.id}')">Del</button></td>
+                        </tr>`
+                })
+                document.getElementById("container").innerHTML=data
+            })    
+         }
+       
+         const edit = (id) =>{
+            userid=id
+            let url ="http://localhost:1234/userapi/" +id
+            fetch(url)
+            .then(response=>response.json())
+            .then(userinfo =>{
+                document.getElementById("bookname").value=userinfo.bookname
+            })
+
+         }
+        const del = (id) =>{
+            let url ="http://localhost:1234/userapi/" +id
+            let postdata={method:"delete"}
+            fetch(url,postdata)
+            .then(response=>response.json())
+            .then(userinfo =>{
+                getbook()
+            })
+
+         }
+      const search = () => {
+    let s = document.getElementById("search").value.toLowerCase();
+
+    fetch("http://localhost:1234/userapi")
+    .then(response => response.json())
+    .then(userarray => {
+        let data = "";
+        userarray.map(user => {
+            if (user.bookname.toLowerCase().includes(s)) {
+                data += `<tr>
+                    <td>${user.id}</td>
+                    <td>${user.bookname}</td>
+                    <td><button onclick="edit('${user.id}')">Edit</button></td>
+                    <td><button onclick="del('${user.id}')">Del</button></td>
+                </tr>`;
+            }
+        });
+        document.getElementById("container").innerHTML = data;
+    });
+}
+       
+    </script>
+</body>
+</html>

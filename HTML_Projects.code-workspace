@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "../HTML_Projects"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../Sample"
+		},
+		{
+			"path": "../weather"
+		},
+		{
+			"path": "../Webpage"
+		},
+		{
+			"path": "../json folder"
+		},
+		{
+			"path": "../class1"
+		}
+	],
+	"settings": {
+		"liveServer.settings.port": 5501,
+		"liveServer.settings.multiRootWorkspaceName": "HTML_Projects"
+	}
+}

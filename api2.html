@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="getuser()">
+    <p align ="center">
+        <input type ="text" id="fullname" placeholder="Enter your Name"></input>
+        <input type ="text" id="mobile" placeholder="Enter your Mobile.No"></input>
+        <button onclick="save()" >Save User</button>
+    </p>
+    <table align="center" cellpadding="15" border="1">
+        <tr>
+            <th>ID</th>
+            <th>fullname</th>
+            <th>Mobile</th>
+            <th colspan="2">Action</th>
+        </tr>
+       <tbody id="container"></tbody>
+    </table>
+
+
+
+    <script>
+        let userid="";
+        const save = async () =>{
+            let name= document.getElementById("fullname").value;
+            let mobile= document.getElementById("mobile").value;
+            let url="http://localhost:1234/userapi";
+            let mymethod="post";
+            if(userid != ""){
+                mymethod ="put";
+                url="http://localhost:1234/userapi/" + userid;
+                userid ="";
+            }
+            let newuser ={fullname:name,mobile:mobile}
+            let postdat = {
+            headers:{'content-type':  'application/json'},
+            method:mymethod,
+            body: JSON.stringify(newuser)
+            }
+       await fetch(url,postdat)
+        .then(response =>response.json())
+        .then(info =>{
+           getuser()
+        })
+                }
+        const edituser =(id) =>{
+            console.log("helo")
+            userid = id;
+            let url= "http://localhost:1234/userapi/" +id;
+            fetch(url)
+            .then(response =>response.json())
+            .then(editarray =>
+                {
+                    document.getElementById("fullname").value=editarray.fullname;
+                    document.getElementById("mobile").value=editarray.mobile;
+
+                }
+            ) }
+            const deluser =(id) =>{
+            console.log("helo")
+            let postdata= {method:"delete"}
+            let url= "http://localhost:1234/userapi/"+id;
+            fetch(url,postdata) 
+            .then(response =>response.json())
+            .then(editarray =>
+                {
+                   getuser()
+
+                }
+            ) 
+
+        }
+        const getuser = () =>{
+            
+            fetch("http://localhost:1234/userapi")
+            .then(response =>response.json())
+            .then(userarray =>
+                {
+                    let data =""
+                    userarray.map((user,index)=>{
+                        data=data+ `<tr>
+                            <td>${user.id}</td>
+                            <td>${user.fullname}</td>
+                            <td>${user.mobile}</td>
+                            <td><button onclick="edituser('${user.id}')">Edit</button></td>
+                            <td><button onclick="deluser('${user.id}')">Del</button></td>
+                            </tr>`
+                    })
+                    document.getElementById("container").innerHTML = data;
+                    
+                    }
+                
+            )
+        }
+    </script>
+
+</body>
+</html>

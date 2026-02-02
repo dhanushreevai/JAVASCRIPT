@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="getuser()">
+    <p align = "center">
+    <input type="text" id="fname" placeholder="Enter your Name">
+    <input type="text" id="mobile" placeholder="Enter your Mobile">
+    <button onclick="save()">Save User</button>
+    </p>
+    <table align ="center" border="1" cellpadding="15">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th colspan="2">Action</th>
+        </tr>
+        <tbody id="container"></tbody>
+    </table> 
+
+
+    <script>
+        const save = async () =>{
+            let name=document.getElementById("fname").value 
+            let mobile=document.getElementById("mobile").value
+            let newuser = {fullname:name,mobile:mobile}
+            let url = "http://localhost:1234/urapi"
+            let postdata = {
+                headers: {'content-type' : 'application/json' } ,
+                method:"post",
+               body:JSON.stringify(newuser)
+            }
+            try{
+            await fetch(url,postdata)
+            .then(response =>response.json()) 
+            .then(info=>{
+                console.log(info)
+            })
+          }
+          catch(error){
+            alert("Server Slow");
+            console.log(error + "this is error")
+          }
+        }
+        let userid=""
+        const edit =(id) =>{
+            userid=id
+            let url = "http://localhost:1234/userapi/" +id 
+            fetch(url)
+            .then(response => response.json())
+            .then(userinfo=>{
+                document.getElementById("fname").value=userinfo.fullname
+                document.getElementById("mobile").value=userinfo.mobile
+
+            })
+
+        }
+        const getuser = () =>{
+            fetch("http://localhost:1234/userapi")
+            .then(response=>response.json())
+            .then(userarray=>{
+                let data =""
+                userarray.map((user,index) =>{
+                    data=data +`<tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.mobile}</td>
+                        <td><button onclick="edit('${user.id}')"">Edit</button></td>
+                        <td><button onclick="del('${user.id}')"">Del</button></td>
+                        </tr>`
+                })
+                document.getElementById("container").innerHTML=data
+            })
+        }
+    </script>
+</body>
+</html>
